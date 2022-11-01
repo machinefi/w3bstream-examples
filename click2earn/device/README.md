@@ -1,0 +1,1 @@
+# click2earn example
