@@ -21,19 +21,22 @@ func _start(rid uint32) int32 {
 	res := string(message)
 
 	Points := gjson.Get(res, "Points")
+	Account := gjson.Get(res,"Account")
 
-	common.Log("wasm get Points from json: " + Connections.String())
+	common.Log("wasm get Points from json: " + Points.String())
 
 	if Points.Int() > 1000 {
 		common.SendTx(fmt.Sprintf(
 			`{
 				"to": "%s",
 				"value": "0",
-				"data": "1249c58b"
+				"data": "6a627842000000000000000000000000%s"
 			}`,
-			"0x3ac682102B7Bfef43D2f48e17e14CDcC055D11fd",//W3BStreamNFT contract address
+			"0xd6E9f94FD0247157d947fd18BfEbf204b5156d1F",//W3BStreamNFT contract address
+			Account.String(),
+			
 		))
-		common.Log("W3BStreamNFT has been sent to the private key account address")
+		common.Log("W3BStreamNFT has been sent to :" + Account.String())
 	}
 
 	return 0
