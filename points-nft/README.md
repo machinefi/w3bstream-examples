@@ -101,12 +101,16 @@ func main() {
 You can refer this doc [README.md](/click2earn/README.md#hardware)
 
 ## Receive data
-After receiving the data, applet will output the following log to docker. Every time you send the data five times, your account will mint an erc20 token.
+After receiving the data, applet will output the following log to docker. Your account will mint an erc721 token.
 
-![txhash](https://user-images.githubusercontent.com/35157091/198268955-9c625299-fc45-46c2-be6e-af3a4873a68b.png)
+![0ed36c3a70d837ba6a357bc4b73127f](https://user-images.githubusercontent.com/35157091/199143442-76d4b5eb-86c1-4b47-ae3c-bcec2958f8ce.jpg)
 
-There is the erc20 token contract address `0xb73eE6EB5b1984c78CCcC49eA7Ad773E71d74F51`
+
+There is the erc721 token contract address on `IoTeX testnet` `0xd6E9f94FD0247157d947fd18BfEbf204b5156d1F`
 
 You can check it in [spoon](https://app.spoon.limo/github/spoonproject/examples?path=W3BStream%20ERC20.json)
 
 ## Check NFT
+You can check it in spoon
+![dfe3f6f97c18e381008e776616bc65d](https://user-images.githubusercontent.com/35157091/199143503-515376b7-c46f-4f2d-a844-de698db081da.jpg)
+
