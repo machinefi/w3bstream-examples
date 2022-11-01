@@ -7,6 +7,7 @@
 ## Contents
 -  [click2earn](https://github.com/machinefi/w3bstream-examples/tree/main/click2earn/)
 -  [device-proof](https://github.com/machinefi/w3bstream-examples/tree/main/device-proof/)
+-  [points-nft](/points-nft)
 
 
 ## Technology stack
@@ -29,8 +30,9 @@
   ```
 
   After you start the mirror locally, the preparatory work can be completed. Here are the detailed tutorials for each project.
-  - [device-proof](https://github.com/machinefi/w3bstream-examples/blob/main/device-proof/README.md)
-  - [click2earn](https://github.com/machinefi/w3bstream-examples/tree/main/click2earn/)
+  - [device-proof](/device-proof/README.md)
+  - [click2earn](/click2earn)
+  - [points-nft](/points-nft)
   
   ## Development Planning
   Our Development is fully tracked on this public Roadmap 🎉
