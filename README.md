@@ -1,6 +1,5 @@
 # W3BStream Examples
 
-![Docs](https://img.shields.io/badge/docs-%F0%9F%93%84-blue)
 
 ### This project is a collection of w3bstream example projects, through which you can quickly learn how to develop dapp on w3bstream
 
