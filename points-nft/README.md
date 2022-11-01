@@ -110,6 +110,7 @@ There is the erc721 token contract address on `IoTeX testnet` `0xd6E9f94FD024715
 
 
 ## Check NFT
-You can check it in [spoon](https://app.spoon.limo/github/spoonproject/examples?path=W3BStream NFT.json)
+You can check it in [spoon](https://app.spoon.limo/github/spoonproject/examples?path=W3BStream%20NFT.json)
+
 ![dfe3f6f97c18e381008e776616bc65d](https://user-images.githubusercontent.com/35157091/199143503-515376b7-c46f-4f2d-a844-de698db081da.jpg)
 
