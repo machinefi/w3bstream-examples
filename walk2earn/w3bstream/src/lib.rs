@@ -24,8 +24,8 @@ lazy_static! {
     static ref DEVICES_REGISTRY: Contract = serde_json::from_str(abi::DEVICES_REGISTRY).unwrap();
 }
 
-const CONTRACT_ADDR_DEVICES_REGISTRY: &str = "0xf22F0FAD91f8bB81743CEFC33CEeA5613647973F";
-const CONTRACT_ADDR_WALK_TO_EARN: &str = "0x6827843ED1Ab36aC2DaA70e5e048F415f553632e";
+const CONTRACT_ADDR_DEVICES_REGISTRY: &str = "0xEdC27f3dbECf10e2704c6B9979DD3beeB5A1121c";
+const CONTRACT_ADDR_WALK_TO_EARN: &str = "0x9F416bD162c6f96196F38617F77B52F6CFcf9aaF";
 
 #[no_mangle]
 pub extern "C" fn alloc(size: i32) -> *mut u8 {

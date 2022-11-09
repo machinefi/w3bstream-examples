@@ -1,5 +1,5 @@
 applet: 
-	@cd w3bstream/src && make
+	@cd w3bstream && make
 
 deploy_contracts:
 	@cd blockchain && make deploy
