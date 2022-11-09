@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/tidwall/gjson"
-
-	common "github.com/iotexproject/w3bstream/examples/wasm_common_go"
+	
+	common "github.com/machinefi/w3bstream/_examples/wasm_common_go"
 )
 
 func main() {}

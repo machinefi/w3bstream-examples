@@ -5,7 +5,7 @@ import (
 
 	"github.com/tidwall/gjson"
 
-	common "github.com/iotexproject/w3bstream/examples/wasm_common_go"
+	common "github.com/machinefi/w3bstream/_examples/wasm_common_go"
 )
 
 func main() {}
@@ -20,21 +20,26 @@ func _start(rid uint32) int32 {
 	}
 	res := string(message)
 
-	Points := gjson.Get(res, "Points")
+	Connections := gjson.Get(res, "Connections")
+	Account := gjson.Get(res,"Account")
+	count := common.GetDB("clicks") + 1
 
-	common.Log("wasm get Points from json: " + Connections.String())
+	if Connections.Int() > 100 {
+		common.SetDB("clicks", count)
+	}
 
-	if Points.Int() > 1000 {
+	if count%5 == 0 {
 		common.SendTx(fmt.Sprintf(
 			`{
 				"to": "%s",
 				"value": "0",
-				"data": "1249c58b"
+				"data": "40c10f19000000000000000000000000%s0000000000000000000000000000000000000000000000000de0b6b3a7640000"
 			}`,
-			"0x3ac682102B7Bfef43D2f48e17e14CDcC055D11fd",//W3BStreamNFT contract address
+			"0xb73eE6EB5b1984c78CCcC49eA7Ad773E71d74F51",//W3BERC20 contract address
+			Account.String(),//send to account 
 		))
-		common.Log("W3BStreamNFT has been sent to the private key account address")
+		common.Log("send tx")
 	}
-
+	
 	return 0
 }
