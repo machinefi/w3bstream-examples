@@ -116,12 +116,10 @@ void loop() {
   Serial.println("\n---- NEW MESSAGE ----");
   
   // Get timestamp from Internet
-  String timestamp = String(timeClient.getEpochTime()); 
+  int timestamp = timeClient.getEpochTime(); 
   
   // Send http message
   sendEventHttp(steps, timestamp);
-    
-  delay(3000);
   
 }
 
@@ -176,7 +174,7 @@ bool readSteps() {
 }
 
 
-void sendEventHttp(int steps, String timestamp)
+void sendEventHttp(int steps, int timestamp)
 {
     const String httpEndpoint = "/srv-applet-mgr/v0/event/" + String(W3BSTREAM_PROJECT);
     const String url = "http://" + String(W3BSTREAM_HOST) + ":" + String(W3BSTREAM_HTTP_PORT) + httpEndpoint;
@@ -187,7 +185,7 @@ void sendEventHttp(int steps, String timestamp)
    
     httpClient.post(httpEndpoint, "application/json", body);
     int statusCode = httpClient.responseStatusCode();
-    if (statusCode != 200)
+    if (statusCode != 200 && statusCode != 201)
     {
        Serial.println("Error sending HTTP POST request:");
        Serial.println("Status code: " + String(statusCode));
@@ -208,14 +206,14 @@ String escdq(const String str) {
     return strCopy;
 }
 
-JSONVar getPayloadJSON(int steps, String timestamp)
+JSONVar getPayloadJSON(int steps, int timestamp)
 {
     // Build the header
     JSONVar header_json;
-    header_json["event_type"] = "\" + W3BSTREAM_EVENT_TYPE + \"";
+    header_json["event_type"] = W3BSTREAM_EVENT_TYPE;
     header_json["pub_id"] = W3BSTREAM_PUB_ID;
     header_json["token"] = W3BSTREAM_PUB_TOKEN;
-    header_json["pub_time"] = timeClient.getEpochTime();
+    header_json["pub_time"] = timestamp;
 
     JSONVar data_message;
     data_message["steps"] = steps;
@@ -239,6 +237,8 @@ JSONVar getPayloadJSON(int steps, String timestamp)
 
 String HashAndSign(JSONVar data_message) {
     String message = JSON.stringify(data_message);
+    Serial.println("Message is " + message);
+
     byte hash[32] = {0};
     ECCX08.beginSHA256();
     ECCX08.endSHA256((byte*)message.c_str(), message.length(), hash);
@@ -247,7 +247,9 @@ String HashAndSign(JSONVar data_message) {
     // Sign the message.
     byte signature[64];
     ECCX08.ecSign(slot, hash, signature);
-    Serial.println("Signature is " + BufferHexToStr(signature, sizeof(signature)));
+    String signature_string = BufferHexToStr(signature, sizeof(signature));
+    Serial.println("Signature is " + signature_string);
+    return signature_string;
 }
 
 
