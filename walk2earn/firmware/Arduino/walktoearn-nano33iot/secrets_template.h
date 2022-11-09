@@ -11,13 +11,13 @@ const char W3BSTREAM_EVENT_TYPE[] = "CLICK";
 // W3bstream Publisher ID
 const char W3BSTREAM_PUB_ID[] = "stepcounter";
 // W3bstream Publisher Auth Token
-const char W3BSTREAM_PUB_TOKEN[] = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJQYXlsb2FkIjoiOTAwOTUzMDgxMzc4NTA5NSIsImlzcyI6InczYnN0cmVhbSIsImV4cCI6MTY2Nzk1MDczN30.bYVuIcdS9jGqw3IIo4ygkp8Rw64HtZnP_0b3TWPAZoQ";
+const char W3BSTREAM_PUB_TOKEN[] = "";
 
 // Wifi configuration
 // ------------------------------------------------ 
 // Wifi ssid.
-const char WIFI_SSID[] = "TIM-87716465";
+const char WIFI_SSID[] = "SSID";
 //const char wifiSsid[] = "iPhone di Simone";
 // Wifi password.
-const char WIFI_PASSWORD[] = "SimoneWifi#123";
+const char WIFI_PASSWORD[] = "PASSWORD";
 // ------------------------------------------------ 
