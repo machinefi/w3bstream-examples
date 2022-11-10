@@ -4,9 +4,10 @@
 ### This project is a collection of w3bstream example projects, through which you can quickly learn how to develop dapp on w3bstream
 
 ## Contents
--  [click2earn](https://github.com/machinefi/w3bstream-examples/tree/main/click2earn/)
--  [device-proof](https://github.com/machinefi/w3bstream-examples/tree/main/device-proof/)
+-  [click2earn](/click2earn/)
+-  [device-proof](/device-proof/)
 -  [points-nft](/points-nft)
+-  [walk2earn](/walk2earn)
 
 
 ## Technology stack
@@ -20,24 +21,15 @@
 
 ## Get Start
   First, you need to follow the [w3bstream](https://github.com/iotexproject/w3bstream) tutorial to start a docker container locally.
-  You need to add your private key to the configuration file before packaging the image in `cmd/srv-applet-mgr/config/local.yml `
+  Then you can refer to [docs.w3bstream](https://docs.w3bstream.com/applets-development/configuring-w3bstream#w3bstreams-private-key) to configure your private key
   
-  `local.yml`
-  
-  ```yml
-  SRV_APPLET_MGR__ETHCLIENTCONFIG__PrivateKey: <YOUR PRIVATE KEY>
-  ```
 
-  After you start the mirror locally, the preparatory work can be completed. Here are the detailed tutorials for each project.
-  - [device-proof](/device-proof/README.md)
+  After you start the w3bstream locally, the preparatory work can be completed. Here are the detailed tutorials for each project.
   - [click2earn](/click2earn)
+  - [device-proof](/device-proof/README.md)
   - [points-nft](/points-nft)
+  - [walk2earn](/walk2earn)
   
-  ## Development Planning
-  Our Development is fully tracked on this public Roadmap 🎉
-
-  For even more information you can take a look at ... 🔔
-  
-  > 🚧 This document is work-in progress 🚧
+  ## 🚧 This document is work-in progress 🚧
   > The documents under this section are subject to frequent changes. 
   > Please come back to check on the status of this page at a later date. 
