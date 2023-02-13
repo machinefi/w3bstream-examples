@@ -1,5 +1,5 @@
-github.com/machinefi/w3bstream-wasm-golang-sdk v0.2.0 h1:A+S+CGKsXwlLBJEtZ3b8R4i65EugML4i7ahKmiCCvI4=
-github.com/machinefi/w3bstream-wasm-golang-sdk v0.2.0/go.mod h1:zr5XnttcOwfbCWt04aibAfxFFh8Wg7WLks1mOaPDQLI=
+github.com/machinefi/w3bstream-wasm-golang-sdk v1.0.0 h1:MsC41JzPentlOneiMHFLR8QudxUDza+i4BLWbVPIoe8=
+github.com/machinefi/w3bstream-wasm-golang-sdk v1.0.0/go.mod h1:zr5XnttcOwfbCWt04aibAfxFFh8Wg7WLks1mOaPDQLI=
 github.com/tidwall/gjson v1.14.4 h1:uo0p8EbA09J7RQaflQ1aBRffTR7xedD2bcIVSYxLnkM=
 github.com/tidwall/gjson v1.14.4/go.mod h1:/wbyibRr2FHMks5tjHJ5F8dMZh3AcwJEMf5vlfC0lxk=
 github.com/tidwall/match v1.1.1 h1:+Ho715JplO36QYgwN9PGYNhgZvoUSc9X2c80KVTi+GA=
