@@ -1,0 +1,27 @@
+{
+  "name": "assemblyscript",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node tests",
+    "asbuild": "asc assembly/index.ts --target release --use abort=assembly/index/abort -o ./build/click2earn.wasm",
+    "start": "npx serve ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "assemblyscript": "^0.27.0"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./build/release.js",
+      "types": "./build/release.d.ts"
+    }
+  },
+  "dependencies": {
+    "@w3bstream/wasm-sdk": "^0.3.1"
+  }
+}
