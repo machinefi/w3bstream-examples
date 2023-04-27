@@ -20,20 +20,38 @@ export function start(rid: i32): i32 {
 }
 /*
 "Payload": {
-    "address":"0x6be13c652c457097b28bf9d2c70677bece199f62",
-    "topics":["0x9fd2c28ce9affee8592933156880418279ba95f7c71e344a71d1928a7c982979"],
-    "data":"0x0000000000000000000000006d443995cbaf0c4fdbb9163136ebcead9ee9c3200000000000000000000000006b132450c6988246cf60501f37cdf7eed5d19176",
-    "blockNumber":"0x130cd43",
-    "transactionHash":"0x516d93eba92ce986f4d352f3805ae56ab21fdc297788d78072f02f753656c7b9",
+    "address":"0x6ea84c048e935ff709ba8f2fcd4730476ae3175b",
+    "topics":[
+        "0x9fd2c28ce9affee8592933156880418279ba95f7c71e344a71d1928a7c982979",
+        "0x0000000000000000000000006d443995cbaf0c4fdbb9163136ebcead9ee9c319",
+        "0x0000000000000000000000006b132450c6988246cf60501f37cdf7eed5d19176"
+    ],
+    "data":"0x",
+    "blockNumber":"0x130cf90",
+    "transactionHash":"0x6a3fbe46fca1d958e2a630ae050d07569d1a7e973eb21bddb76b8ddd3f69c901",
     "transactionIndex":"0x0",
-    "blockHash":"0x3a084426568060950de46b30327d0204f890bd9135cfa4cad2956414214f07e3",
+    "blockHash":"0xa7479d8e23bfc379527c723a571895d0c8f2f75d0ec6056023b1129e35023751",
     "logIndex":"0x0",
     "removed":false
 }
 */
 export function handle_device_binding(rid: i32): i32 {
     let message_string = GetDataByRID(rid);
-    log("New Device Binding Detected: "+message_string);
+    log("New Device Binding Detected: ");
+    let message_json = JSON.parse(message_string) as JSON.Obj;
+    let topics = message_json.get("topics") as JSON.Arr;
+    let device_id_padded = topics._arr[1] as JSON.Str;
+    let owner_address_padded = topics._arr[2] as JSON.Str;
+    // Addresses are the last 40 bytes
+    let device_id = device_id_padded.valueOf().slice(26);
+    let owner_address = owner_address_padded.valueOf().slice(26);
+    log("Device ID: " + device_id);
+    log("Owner Address: " + owner_address);
+
+    // Store the device binding in the DB
+    log("Storing device binding in DB...");
+    let sql = `INSERT INTO "device_bindings" (device_id, owner_address) VALUES (?,?);`;
+    ExecSQL(sql, [ new String(device_id), new String(owner_address)]);
     return 0;
 }
 
