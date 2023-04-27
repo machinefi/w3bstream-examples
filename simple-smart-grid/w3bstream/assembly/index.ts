@@ -1,6 +1,6 @@
 import { Log, GetDataByRID, JSON, CallContract, ExecSQL } from "@w3bstream/wasm-sdk";
 import { String } from "@w3bstream/wasm-sdk/assembly/sql";
-import { hex_encode, hex_decode, decode } from "./hex-decode"
+import { decode } from "./hex-decode"
 
 // Note: The { alloc } export is required, until it's implemented inside the W3bstream host
 export { alloc } from "@w3bstream/wasm-sdk";
@@ -33,36 +33,42 @@ export function handle_rewards_request(rid: i32): i32 {
 
 // Verify that the device public key is authorized
 function auth_device(device_id: string): bool {
-    Log("Authenticating device on chain: " + device_id)
+    log("Authenticating device on chain: " + device_id)
     if (!device_id) return false;
     
-    const REGISTRY_CONTRACT = "0xb4d2c4D022C01Ac102752CA776027674F9e6CEB6";
+    const REGISTRY_CONTRACT = "0x3F124c7F6CC1919C3b244f60d63b32Ca28ce4C6a";
     const ENCODED_CALL = 
         "0xa6fe66de000000000000000000000000" 
         + device_id.replace("0x","");
 
-    Log("Calling contract: " + REGISTRY_CONTRACT + " with encoded call: " + ENCODED_CALL)    
+    log("Calling contract: " + REGISTRY_CONTRACT + " with encoded call: " + ENCODED_CALL)    
     let ret = CallContract(4690, REGISTRY_CONTRACT, ENCODED_CALL);
     let decoded = decode(ret);
-    Log("Contract call returned: " + decoded + ", length: " + ret.length.toString()+"...")
+    log("Contract call returned: " + decoded + ", length: " + ret.length.toString()+"...")
     
     return (ret.length > 0);
 }
 
 // Get the owner of a specific device id
 function get_device_owner(device_id: string): string {
+    log("Getting device owner from chain...");
     if (!device_id) return "";
-    const BINDING_CONTRACT = "0xDA55871852275fc08222b321A20fBead0677d0E7";
-    let ret = CallContract(
-        4690,
-        BINDING_CONTRACT,
-        "0x459b23a4000000000000000000000000" + device_id.replace("0x",""));
-    return ret;
+    const BINDING_CONTRACT = "0x6BE13c652C457097b28bf9D2C70677bECe199f62";
+    const ENCODED_CALL = 
+    "0x459b23a4000000000000000000000000" 
+    + device_id.replace("0x","");
+
+    log("Calling contract: " + BINDING_CONTRACT + " with encoded call: " + ENCODED_CALL)    
+    let ret = CallContract(4690, BINDING_CONTRACT, ENCODED_CALL);
+    let decoded = decode(ret);
+    log("Contract call returned: " + decoded + ", length: " + ret.length.toString()+"...")
+    
+    return (decoded);
 }
 
 // Verify that the message signature is correct and the device public key is authorized
 function validateDeviceIdentity(message_json: JSON.Obj): i32 {
-    Log("Validating device identity")
+    log("Validating device identity")
     // Get the public key from the message
     let public_key = getStringField(message_json, "public_key");
 
@@ -73,22 +79,27 @@ function validateDeviceIdentity(message_json: JSON.Obj): i32 {
     // this is best performed in Rust or Go
     
     // Verify that the device public key is authorized
-    return assert(auth_device(publcKeyToDeviceId(public_key)), "Device is not authorized");
+    if (!auth_device(publcKeyToDeviceId(public_key))) kill("Device not authorized");
+    // check the owner of the device
+    let owner = get_device_owner(publcKeyToDeviceId(public_key));
+    if (!owner) kill("Device owner not found");
+    log("Device owner: " + owner);
+    return 0;
 }
 
 function validateData(rid: i32): JSON.Obj { 
     // Get the device data message from the W3bstream host
     let message_string = GetDataByRID(rid);
-    Log("Validating data message: " + message_string)
+    log("Validating data message: " + message_string)
     // Parse the data message into a JSON object
     let message_json = JSON.parse(message_string) as JSON.Obj;
     // Validate the message fields
-    assert(message_json.has("public_key"), "public_key field is missing");
-    assert(message_json.has("signature"), "device_signature field is missing");
-    assert(message_json.has("data"), "data field is missing");
+    if (!message_json.has("public_key")) kill("public_key field is missing");
+    if (!message_json.has("signature")) kill("device_signature field is missing");
+    if (!message_json.has("data")) kill("data field is missing");
     let data_json = message_json.get("data") as JSON.Obj;
-    assert(data_json.has("sensor_reading"), "sensor_reading field is missing");
-    assert(data_json.has("timestamp"), "timestamp field is missing");
+    if (!data_json.has("sensor_reading")) kill("sensor_reading field is missing");
+    if (!data_json.has("timestamp")) kill("timestamp field is missing");
 
     return message_json;
 } 
@@ -99,18 +110,18 @@ function validateRewardsRequest(rid: i32): JSON.Obj {
     // Parse the data message into a JSON object
     let message_json = JSON.parse(message_string) as JSON.Obj;
     // Validate the message fields
-    assert(message_json.has("public_key"), "public_key field is missing");
-    assert(message_json.has("signature"), "device_signature field is missing");
-    assert(message_json.has("data"), "data field is missing");
+    if (!message_json.has("public_key")) kill("public_key field is missing");
+    if (!message_json.has("signature")) kill("device_signature field is missing");
+    if (!message_json.has("data")) kill("data field is missing");
     let data_json = message_json.get("data") as JSON.Obj;
-    assert(data_json.has("device_id"), "device_id field is missing");
-    assert(data_json.has("timestamp"), "timestamp field is missing");
+    if (!data_json.has("device_id")) kill("device_id field is missing");
+    if (!data_json.has("timestamp")) kill("timestamp field is missing");
 
     return message_json;
 }
 
 function storeData(message_json: JSON.Obj): i32 { 
-    Log("Storing data message")
+    log("Storing data message")
     // Get the device public key
     let public_key = getStringField(message_json, "public_key");
     // Get the device data
@@ -121,18 +132,18 @@ function storeData(message_json: JSON.Obj): i32 {
     let timestamp = getIntField(data_json, "timestamp");
     // Store the data in the W3bstream SQL Database
     const query = `INSERT INTO "data_table" (public_key,sensor_reading,timestamp) VALUES (?,?,?);`;
-    Log("Executing query: " + query);
-    Log("With parameters: " + public_key + ", " + sensor_reading + ", " + timestamp);
+    log("Executing query: " + query);
+    log("With parameters: " + public_key + ", " + sensor_reading + ", " + timestamp);
     const value = ExecSQL(
         query, 
         [new String(public_key), new String(sensor_reading), new String(timestamp)]);
-    Log("Query returned: " + value.toString()+"]");
+    log("Query returned: " + value.toString()+"]");
 
     return value;
 }
 
 function process_rewards(message_json: JSON.Obj): i32 { 
-    Log("Processing rewards request - todo");
+    log("Processing rewards request - todo");
     // We will process rewards based on data sent in 24h intervals
   const SECONDS_24H = 60 * 60 * 24;
   let data_json = message_json.get("data") as JSON.Obj;
@@ -146,7 +157,7 @@ function process_rewards(message_json: JSON.Obj): i32 {
   //let end_interval = start_interval + SECONDS_24H;
   // Make sure 24h has passed 
   /*
-  assert(request_time >= end_interval, "Too early for rewards calculation (every 24h)");
+  kill(request_time >= end_interval, "Too early for rewards calculation (every 24h)");
   while (request_time >= end_interval) {
     // Evaluate energy consumption in the interval
     let tokens = process_rewards(device_id, start_interval, end_interval);
@@ -180,10 +191,31 @@ function getIntField(message_json: JSON.Obj, field_name: string): string {
 
 function publcKeyToDeviceId(public_key: string): string {
     // The device id are the first 20 bytes of the public key
-    let device_id = public_key.substr(2, 20);
+    let device_id = public_key.slice(2, 42);
     return device_id;
 }
 
-function log_info(message: string): void {
+function log(message: string): i32 {
     Log(log_count.toString() + " - " + message + " ");
+    log_count++;
+    return 0;
+}
+
+function kill(message: string): void {
+    assert(false, message);
+}
+
+export function abort(
+  message: string | null,
+  fileName: string | null,
+  lineNumber: u32,
+  columnNumber: u32
+): void { 
+  if (message == null) message = "unknown error";
+  if (fileName == null) fileName = "unknown file";
+  Log("ABORT: " + message
+    + " (at " + fileName
+    + ":" + lineNumber.toString() 
+    + ":" + columnNumber.toString()
+    + ") ");
 }
