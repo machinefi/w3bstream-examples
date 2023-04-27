@@ -136,3 +136,6 @@ dist
 **/artifacts
 **/cache
 **/.DS_Store
+
+# assemblyscript
+**/build
