@@ -1,7 +1,8 @@
 ## Simple Identity/Binding contracts
 
 ### Quick start
-```
+
+```sh
 npm install
 
 export PRIVATE_KEY=<Your IoTeX testnet wallet private key>
