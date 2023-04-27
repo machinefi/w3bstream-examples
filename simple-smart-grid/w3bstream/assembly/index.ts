@@ -18,6 +18,24 @@ export function start(rid: i32): i32 {
 
   return 0;
 }
+/*
+"Payload": {
+    "address":"0x6be13c652c457097b28bf9d2c70677bece199f62",
+    "topics":["0x9fd2c28ce9affee8592933156880418279ba95f7c71e344a71d1928a7c982979"],
+    "data":"0x0000000000000000000000006d443995cbaf0c4fdbb9163136ebcead9ee9c3200000000000000000000000006b132450c6988246cf60501f37cdf7eed5d19176",
+    "blockNumber":"0x130cd43",
+    "transactionHash":"0x516d93eba92ce986f4d352f3805ae56ab21fdc297788d78072f02f753656c7b9",
+    "transactionIndex":"0x0",
+    "blockHash":"0x3a084426568060950de46b30327d0204f890bd9135cfa4cad2956414214f07e3",
+    "logIndex":"0x0",
+    "removed":false
+}
+*/
+export function handle_device_binding(rid: i32): i32 {
+    let message_string = GetDataByRID(rid);
+    log("New Device Binding Detected: "+message_string);
+    return 0;
+}
 
 // This handler will be called each time a rewards processing request is sent to our W3bstream project
 export function handle_rewards_request(rid: i32): i32 {

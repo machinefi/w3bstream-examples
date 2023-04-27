@@ -19,8 +19,8 @@ contract DeviceBinding is Ownable {
     mapping(address => uint) public DevicesCount;
 
     // Events
-    event OwnershipAssigned (address _deviceId, address _ownerAddress);
-    event OwnershipRenounced (address _deviceId);
+    event OwnershipAssigned (address indexed _deviceId, address indexed _ownerAddress);
+    event OwnershipRenounced (address indexed _deviceId);
 
     constructor() {
         console.log("Deploying DeviceBinding contract");
