@@ -5,9 +5,11 @@
 
 ## Contents
 -  [click2earn](/click2earn/)
+-  [simple device identity/binding](/identity-binding)
 -  [device-proof](/device-proof/)
 -  [points-nft](/points-nft)
 -  [walk2earn](/walk2earn)
+-  [simple smart grid](/simple-smart-grid)
 
 
 ## Technology stack
