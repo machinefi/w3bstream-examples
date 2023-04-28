@@ -1,8 +1,8 @@
-import { Simulator, DataPointGenerator} from "@nick-iotex/w3bstream-http-client-simulator";
+import { Simulator, DataPointGenerator} from "@w3bstream/w3bstream-http-client-simulator";
 
-const PUB_ID ="meter2"
-const PUB_TOKEN = ""
-const W3BSTREAM_ENDPOINT = "http://localhost:3000"
+const PUB_ID ="meter"
+const PUB_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJQYXlsb2FkIjoiOTIyMTEzNzY2NjU0Mzg4MTIyMSIsImlzcyI6InczYnN0cmVhbSJ9.nU_C7KqAUSgmE0foh5z8ja-A6F-6MY3OA4TQ7xsDm2s";
+const W3BSTREAM_ENDPOINT = "http://localhost:3000/api/w3bapp/event/simple_smart_grid"
 const EVENT_TYPE = "DATA";
 const EVENT_ID = "DATA";
 
@@ -32,6 +32,7 @@ simulator.init();
 
 simulator.dataPointGenerator = dataGenerator;
 
-const message = simulator.generateEvents(1);
+//const message = simulator.generateEvents(1);
+//console.log(JSON.stringify(message));
+simulator.powerOn(10);
 
-console.log(JSON.stringify(message));
