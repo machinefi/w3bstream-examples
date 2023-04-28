@@ -24,8 +24,6 @@
     }
   },
   "dependencies": {
-    "@solar-republic/wasm-secp256k1": "^0.0.3-beta.2",
-    "@w3bstream/wasm-sdk": "^0.6.0",
-    "as-hex": "^1.0.1"
+    "@w3bstream/wasm-sdk": "^0.6.0"
   }
 }
