@@ -51,9 +51,8 @@ contract DeviceBinding is Ownable {
         return DeviceIds.length;
     }
 
-    function getDeviceOwner(address _deviceId) public view returns (string memory) {
-        string memory ownerAddress = toAsciiString(OwnedDevices[_deviceId].ownerAddress);
-        return ownerAddress;
+    function getDeviceOwner(address _deviceId) public view returns (address) {
+        return OwnedDevices[_deviceId].ownerAddress;
     }
 
     function getOwnedDevices(address _ownerAddress) public view returns (address[] memory) {
