@@ -29,4 +29,9 @@ contract ECOToken is ERC20, AccessControl {
         require(hasRole(BURNER_ROLE, msg.sender), "Caller is not a burner");
         _burn(from, amount);
     }
+
+    function addMinter(address account) public {
+        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "Caller is not an admin");
+        grantRole(MINTER_ROLE, account);
+    }
 }

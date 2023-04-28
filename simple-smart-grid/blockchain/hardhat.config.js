@@ -4,14 +4,11 @@ require('dotenv').config()
 const fs = require('fs');
  
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
-const REGISTRY_CONTRACT = process.env.REGISTRY_CONTRACT_ADDRESS;
-const BINDING_CONTRACT = process.env.BINDING_CONTRACT_ADDRESS;
-const WALKTOEARN_CONTRACT = process.env.WALK_TO_EARN_CONTRACT_ADDRESS;
-const STEPTOKEN_CONTRACT = process.env.STEP_TOKEN_CONTRACT_ADDRESS;
 
 extendEnvironment((hre) => {
   hre.REGISTRY_CONTRACT = process.env.REGISTRY_CONTRACT;
   hre.BINDING_CONTRACT = process.env.BINDING_CONTRACT;
+  hre.TOKEN_CONTRACT = process.env.TOKEN_CONTRACT;
 });
 
 task("envtest", async (args, hre) => {
@@ -66,6 +63,15 @@ task("bindDevice", "Binding device to an owner's account")
     console.log ("Owner is:", ret);
   });
  
+  task("addMinter", "Add a new minter to the Token contract")
+  .addParam("minteraddress", "The minter address.")
+  .setAction(async ({minteraddress}) => {
+    const TokenContract = await ethers.getContractFactory("ECOToken");
+    const tokenContract = await TokenContract.attach(hre.TOKEN_CONTRACT);
+    console.log("Adding minter: ", minteraddress, " to token contract:", hre.TOKEN_CONTRACT);
+    let ret = await tokenContract.addMinter(minteraddress);
+    console.log ("addMinter:", ret);
+  });
  
 module.exports = {
   solidity: "0.8.4",

@@ -1,7 +1,8 @@
-import { GetDataByRID, JSON, CallContract, ExecSQL, QuerySQL } from "@w3bstream/wasm-sdk";
-import { String } from "@w3bstream/wasm-sdk/assembly/sql";
+import { GetDataByRID, JSON, CallContract, ExecSQL, QuerySQL, SendTx } from "@w3bstream/wasm-sdk";
+import { Float32, String } from "@w3bstream/wasm-sdk/assembly/sql";
 import { log, publicKeyToDeviceId, hexToBool, hexToAddress, hexToUtf8 } from "./utils";
 import * as CONST from "./constants";
+import { mintRewards } from "./mintrewards";
 
 // Note: The { alloc } export is required, until it's implemented inside the W3bstream host
 export { alloc } from "@w3bstream/wasm-sdk";
@@ -95,7 +96,7 @@ function validateData(rid: i32): JSON.Obj {
 
 
 function storeData(message_json: JSON.Obj): i32 { 
-    log("Storing data message")
+    log("Storing data message in DB")
     // Get the device public key
     let public_key = getStringField(message_json, "public_key");
     // Get the device data
@@ -106,39 +107,32 @@ function storeData(message_json: JSON.Obj): i32 {
     let timestamp = getIntField(data_json, "timestamp");
     // Store the data in the W3bstream SQL Database
     const query = `INSERT INTO "data_table" (public_key,sensor_reading,timestamp) VALUES (?,?,?);`;
-    log("Executing query: " + query);
-    log("With parameters: " + public_key + ", " + sensor_reading + ", " + timestamp);
     const value = ExecSQL(
         query, 
         [new String(public_key), new String(sensor_reading), new String(timestamp)]);
-    log("Query returned: " + value.toString()+"]");
+    log("Query returned: " + value.toString());
 
     return value;
 }
 
 function process_rewards(message_json: JSON.Obj): i32 { 
-    log("Processing rewards request - todo");
-    // We will process rewards based on data sent in 24h intervals
-  const SECONDS_24H = 60 * 60 * 24;
-  let data_json = message_json.get("data") as JSON.Obj;
-  // Get the device id that is requesting the rewards calculation
-  let device_id = getStringField(data_json, "device_id");
-  // Get the timestamp of the request
-  let request_time = getIntField(data_json, "timestamp");
-  // Fetch the latest request for this device
-  //let start_interval = getLastExecutionTime(message_json);
-  // Build the 24h interval
-  //let end_interval = start_interval + SECONDS_24H;
-  // Make sure 24h has passed 
-  /*
-  kill(request_time >= end_interval, "Too early for rewards calculation (every 24h)");
-  while (request_time >= end_interval) {
-    // Evaluate energy consumption in the interval
-    let tokens = process_rewards(device_id, start_interval, end_interval);
-    start_interval = end_interval + 1;
-    end_interval = start_interval + SECONDS_24H;
-  }*/
-  // If (sendRewards) Store the latest request time for this device
+    log("Processing rewards");
+    // Just reward the most recent data message in the DB  
+    // but more complex logic could be implemented here
+    let sql = "SELECT public_key,sensor_reading FROM data_table ORDER BY id DESC LIMIT 1";
+    let result = QuerySQL(sql);
+    let result_json = JSON.parse(result) as JSON.Obj;
+    let public_key = getStringField(result_json, "public_key");
+    let sensor_reading = parseFloat(getStringField(result_json, "sensor_reading"));  
+    if (sensor_reading < 4.0) {
+        // Reward the device owner
+        let owner = get_device_owner(message_json);
+        let rewards = "3";
+
+        log("Rewarding " + owner + " with 3 ECO Tokens...");
+        let tx_hash = mintRewards(CONST.TOKEN_CONTRACT, owner, CONST.FOUR_TOKENS);
+        log("Reward transaction hash: " + tx_hash);
+    }
   return 0;
 }
 

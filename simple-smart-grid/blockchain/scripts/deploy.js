@@ -43,7 +43,7 @@ async function main() {
   // Save the contract addresses to the config file
   config.REGISTRY_CONTRACT = devicesRegistry.address;
   config.BINDING_CONTRACT = deviceBinding.address;
-  config.ECOTOKEN_CONTRACT = ecoToken.address;
+  config.TOKEN_CONTRACT = ecoToken.address;
   config.DEPLOYED_HEIGHT = devicesRegistry.deployTransaction.blockNumber;
   config.DEPLOYER_ADDRESS = deployer.address;
   config.SaveEnvConfig();
