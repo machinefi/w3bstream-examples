@@ -1,23 +1,33 @@
-import { GetDataByRID, JSON, CallContract, ExecSQL, QuerySQL, SendTx } from "@w3bstream/wasm-sdk";
-import { Float32, String } from "@w3bstream/wasm-sdk/assembly/sql";
-import { log, publicKeyToDeviceId, hexToBool, hexToAddress, hexToUtf8 } from "./utils";
-import * as CONST from "./constants";
+// W3bstream functions and types
+import { GetDataByRID, JSON, ExecSQL, QuerySQL } from "@w3bstream/wasm-sdk";
+import { String } from "@w3bstream/wasm-sdk/assembly/sql";
+// Utility functions
+import { log, publicKeyToDeviceId, verifySig } from "./utils";
 import { mintRewards } from "./mintrewards";
+// Some constants
+import * as CONST from "./constants";
 
-// Note: The { alloc } export is required, until it's implemented inside the W3bstream host
+// W3bstream doesn't implement the alloc() function yet, and it will try
+// to call the one exported in the Applet. It's curretly implemented in the
+// W3bstream package, we just make it available to W3bstream here.
 export { alloc } from "@w3bstream/wasm-sdk";
+
+// These handlers manage contarcts indexing events. They are implemented
+// inside indexting.ts, we need to export them here to make them visible
+// for w3bstream to call them.
 export { handle_device_binding, handle_device_registered } from "./indexing";
 
-// This handler will be executed each time a new data message is sent to our W3bstream project
+// This handler will be executed each time a new data message 
+// is sent to our W3bstream project
 export function start(rid: i32): i32 {
   log("New data message received")
     // validate fields
   let message_json = validateData(rid);
   // Verify device signature
-  validateDeviceIdentity(message_json);
+  assert(validateDeviceIdentity(message_json),"Device identity validation failed");
   // make sure the device has an owner assigned
   let owner = get_device_owner(message_json);
-  assert(owner != CONST.ZERO_ADDRESS,"Device has no owner assigned, I'm dropping the data message");
+  assert(owner != CONST.ZERO_ADDRESS,"No owner assigned for device");
   // Store the IoT data along with the device id 
   storeData(message_json);
 
@@ -47,10 +57,10 @@ function auth_device(message_json: JSON.Obj): bool {
 
 // Get the owner of a specific device id from te w3bstream DB
 function get_device_owner(message_json: JSON.Obj): string {
-    log("Getting device owner from DB...");
     // Get the device id from the message
     let public_key = getStringField(message_json, "public_key");
     let device_id = publicKeyToDeviceId(public_key);
+    log("Getting owner of device "+ device_id);
     let sql = "SELECT owner_address FROM device_bindings WHERE device_id = '" + device_id + "'";
     let result = QuerySQL(sql);
     let result_json = JSON.parse(result) as JSON.Obj;
@@ -60,21 +70,30 @@ function get_device_owner(message_json: JSON.Obj): string {
 }
 
 // Verify that the message signature is correct and the device public key is authorized
-function validateDeviceIdentity(message_json: JSON.Obj): i32 {
+function validateDeviceIdentity(message_json: JSON.Obj): bool {
     log("Validating device identity")
     // Get the public key from the message
     let public_key = getStringField(message_json, "public_key");
-
+    // Verify that the device public key is authorized in the contract
+    let authorized = auth_device(message_json)
+    if (!authorized) {
+        log("Device authentication failed");
+        return false;
+    }
+    log("Device " + public_key + " is authorized")
     // Get the signature from the message
     let signature = getStringField(message_json, "signature");
+    // Get the data object
+    let data: JSON.Obj | null = message_json.getObj("data");
+    if (data == null) return 0;
     // Perform signature verification
-    // ...No Crypto libraries are yet available in AssemblyScript
-    // this is best performed in Rust or Go
-    
-    // Verify that the device public key is authorized in the contract
-    assert(auth_device(message_json), "Device authentication failed");
-    
-    return 0;
+    let signature_ok = verifySig(public_key, signature, data.toString());
+    if (!signature_ok) {
+        log("Data signature is not valid");
+        return false;
+    }
+    log("Data signature is valid")
+    return true;
 }
 
 function validateData(rid: i32): JSON.Obj { 
@@ -130,7 +149,7 @@ function process_rewards(message_json: JSON.Obj): i32 {
         let rewards = "3";
 
         log("Rewarding " + owner + " with 3 ECO Tokens...");
-        let tx_hash = mintRewards(CONST.TOKEN_CONTRACT, owner, CONST.FOUR_TOKENS);
+        let tx_hash = mintRewards(CONST.TOKEN_CONTRACT, owner, CONST.FOUR_TOKENS_HEX);
         log("Reward transaction hash: " + tx_hash);
     }
   return 0;
