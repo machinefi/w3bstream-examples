@@ -71,7 +71,7 @@ function validateDeviceIdentity(message_json: JSON.Obj): i32 {
     // ...No Crypto libraries are yet available in AssemblyScript
     // this is best performed in Rust or Go
     
-    // Verify that the device public key is authorized
+    // Verify that the device public key is authorized in the contract
     assert(auth_device(message_json), "Device authentication failed");
     
     return 0;
