@@ -1,0 +1,19 @@
+[
+    {
+      "header": {
+        "event_type": "DATA",
+        "pub_id": "meter",
+        "token": "",
+        "pub_time": 1682616302032
+      },
+
+      "payload": {
+        "data":{
+          "sensor_reading":0.420,
+          "timestamp":1682616723
+        },
+        "signature": "006f5adc7f000000906f5adc7f000000602a00a87f0000002e000000000000003c00000000000000906f5adc7f000000d06e5adc7f0000000100000000000000",
+        "public_key":"046d443995cbaf0c4fdbb9163136ebcead9ee9c32023b7668384647a950fb0ca2450e8369f062720d91601fc0027373bd937e7ee59f019612b880e085b95cde3bc"
+      }
+    }
+  ]
