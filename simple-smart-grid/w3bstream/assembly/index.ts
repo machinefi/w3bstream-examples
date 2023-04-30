@@ -43,7 +43,7 @@ export function handle_data(rid: i32): i32 {
 // Simply rewards the most recent data message in the DB  
 // but more complex logic could be implemented here
 export function handle_process_rewards(rid: i32): i32 {
-  log("Processing rewards");
+  log_start("Processing rewards");
 
   // Get the device data message from the W3bstream host
   let message_string = GetDataByRID(rid);
@@ -96,8 +96,8 @@ export function handle_process_rewards(rid: i32): i32 {
 }
 */
 export function handle_device_registered(rid: i32): i32 {
+    log_start("New Device Registered Detected: ");
     let message_string = GetDataByRID(rid);
-    log("New Device Registered Detected: ");
     let message_json = JSON.parse(message_string) as JSON.Obj;
     let topics = message_json.get("topics") as JSON.Arr;
     let device_id_padded = topics._arr[1] as JSON.Str;
@@ -107,7 +107,7 @@ export function handle_device_registered(rid: i32): i32 {
 
     // Store the device id in the DB
     log("Storing device id in DB...");
-    let sql = `INSERT INTO "registered_devices" (device_id, is_active) VALUES (?,?);`;
+    let sql = `INSERT INTO "device_registry" (device_id, is_active) VALUES (?,?);`;
     ExecSQL(sql, [ new String(device_id), new Bool(true)]);
     return 0;
 }
@@ -130,8 +130,8 @@ export function handle_device_registered(rid: i32): i32 {
 }
 */
 export function handle_device_binding(rid: i32): i32 {
+    log_start("New Device Binding Detected: ");
     let message_string = GetDataByRID(rid);
-    log("New Device Binding Detected: ");
     let message_json = JSON.parse(message_string) as JSON.Obj;
     let topics = message_json.get("topics") as JSON.Arr;
     let device_id_padded = topics._arr[1] as JSON.Str;
@@ -158,7 +158,7 @@ function auth_device(message_json: JSON.Obj): bool {
     let public_key = getStringField(message_json, "public_key");
     // Get the device id from the message
     let device_id = publicKeyToDeviceId(public_key);
-    let sql = "SELECT is_active FROM registered_devices WHERE device_id = '" + device_id + "'";
+    let sql = "SELECT is_active FROM device_registry WHERE device_id = '" + device_id + "'";
     let result = QuerySQL(sql);
     assert(result != "", "Device is not registered");
 
@@ -178,6 +178,10 @@ function get_device_owner(message_json: JSON.Obj): string {
     log("Getting owner of device "+ device_id);
     let sql = "SELECT owner_address FROM device_bindings WHERE device_id = '" + device_id + "'";
     let result = QuerySQL(sql);
+    if (result == "") {
+        log("Device is not bound to any owner");
+        return CONST.ZERO_ADDRESS;
+    }
     let result_json = JSON.parse(result) as JSON.Obj;
     let owner = getStringField(result_json, "owner_address");
     log("Device owner is: " + owner)
@@ -195,7 +199,6 @@ function validateDeviceIdentity(message_json: JSON.Obj): bool {
         log("Device authentication failed");
         return false;
     }
-    log("Device " + public_key + " is authorized")
     // Get the signature from the message
     let signature = getStringField(message_json, "signature");
     // Get the data object

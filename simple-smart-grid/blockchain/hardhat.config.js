@@ -74,7 +74,7 @@ task("bindDevice", "Binding device to an owner's account")
   });
  
 module.exports = {
-  solidity: "0.8.4",
+  solidity: "0.8.17",
   networks: {
     hardhat: {
       gas: 8500000,

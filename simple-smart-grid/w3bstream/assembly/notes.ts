@@ -1,16 +1,18 @@
 /* 
 W3bstream Tables (all columns are if type string):
 
+registered_devices
+  device_id
+  is_active
+
+device_bindings
+  device_id
+  owner_address
+
 data_table
   public_key
   sensor_reading
   timestamp
-registered_devices
-  device_id
-  is_active
-device_bindings
-  device_id
-  owner_address
 
 
 As an alternative to indexing the events into the W3bstream project's db

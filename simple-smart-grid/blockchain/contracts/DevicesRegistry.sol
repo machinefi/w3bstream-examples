@@ -1,32 +1,26 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "hardhat/console.sol";
-
 import "./interfaces/IDevicesRegistry.sol";
 
 contract DevicesRegistry is Ownable, IDevicesRegistry {
-    event DeviceRegistered(address indexed _deviceId);
-
-    event DeviceDeleted(address indexed _deviceId);
-
-    event DeviceSuspended(address indexed _deviceId);
-
-    event DeviceActivated(address indexed _deviceId);
+   
+    event DeviceRegistered(deviceidtype indexed _deviceId);
+    event DeviceDeleted(deviceidtype indexed _deviceId);
+    event DeviceSuspended(deviceidtype indexed _deviceId);
+    event DeviceActivated(deviceidtype indexed _deviceId);
 
     struct Device {
         bool isRegistered;
         bool isActive;
     }
 
-    mapping(address => Device) public AuthorizedDevices;
+    mapping(deviceidtype => Device) public AuthorizedDevices;
 
-    constructor() {
-        console.log("Deploying DevicesRegistry contract");
-    }
+    constructor() { }
 
-    modifier onlyRegisteredDevice(address _deviceId) {
+    modifier onlyRegisteredDevice(deviceidtype _deviceId) {
         require(
             AuthorizedDevices[_deviceId].isRegistered,
             "Data Source is not registered"
@@ -34,7 +28,7 @@ contract DevicesRegistry is Ownable, IDevicesRegistry {
         _;
     }
 
-    modifier onlyUnregisteredDevice(address _deviceId) {
+    modifier onlyUnregisteredDevice(deviceidtype _deviceId) {
         require(
             !AuthorizedDevices[_deviceId].isRegistered,
             "Data Source already registered"
@@ -42,7 +36,7 @@ contract DevicesRegistry is Ownable, IDevicesRegistry {
         _;
     }
 
-    modifier onlyActiveDevice(address _deviceId) {
+    modifier onlyActiveDevice(deviceidtype _deviceId) {
         require(
             AuthorizedDevices[_deviceId].isActive,
             "Data Source is suspended"
@@ -50,12 +44,12 @@ contract DevicesRegistry is Ownable, IDevicesRegistry {
         _;
     }
 
-    modifier onlySuspendedDevice(address _deviceId) {
+    modifier onlySuspendedDevice(deviceidtype _deviceId) {
         require(!AuthorizedDevices[_deviceId].isActive, "Data Source is active");
         _;
     }
 
-    function registerDevice(address _newDeviceId)
+    function registerDevice(deviceidtype _newDeviceId)
         public
         onlyOwner
         onlyUnregisteredDevice(_newDeviceId)
@@ -64,7 +58,7 @@ contract DevicesRegistry is Ownable, IDevicesRegistry {
         emit DeviceRegistered(_newDeviceId);
     }
 
-    function removeDevice(address _deviceIdToRemove)
+    function removeDevice(deviceidtype _deviceIdToRemove)
         public
         onlyOwner
         onlyRegisteredDevice(_deviceIdToRemove)
@@ -73,7 +67,7 @@ contract DevicesRegistry is Ownable, IDevicesRegistry {
         emit DeviceDeleted(_deviceIdToRemove);
     }
 
-    function suspendDevice(address _deviceIdToSuspend)
+    function suspendDevice(deviceidtype _deviceIdToSuspend)
         public
         onlyOwner
         onlyRegisteredDevice(_deviceIdToSuspend)
@@ -83,7 +77,7 @@ contract DevicesRegistry is Ownable, IDevicesRegistry {
         emit DeviceSuspended(_deviceIdToSuspend);
     }
 
-    function activateDevice(address _deviceIdToActivate)
+    function activateDevice(deviceidtype _deviceIdToActivate)
         public
         onlyOwner
         onlyRegisteredDevice(_deviceIdToActivate)
@@ -93,7 +87,7 @@ contract DevicesRegistry is Ownable, IDevicesRegistry {
         emit DeviceActivated(_deviceIdToActivate);
     }
 
-    function isAuthorizedDevice(address _deviceId)
+    function isAuthorizedDevice(deviceidtype _deviceId)
         public
         view
         override
