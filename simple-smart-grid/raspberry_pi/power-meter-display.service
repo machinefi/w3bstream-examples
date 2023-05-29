@@ -1,0 +1,17 @@
+# Create a systemctl service unit that runs the python script at /home/pi/power-meter-display.py
+# The executable should be restarted on failure
+
+# Start the systemctl unit configuration file
+
+[Unit]
+Description=Power Meter Display
+After=network.target
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+ExecStart=/usr/local/bin/power-meter-display
+
+[Install]
+WantedBy=multi-user.target
