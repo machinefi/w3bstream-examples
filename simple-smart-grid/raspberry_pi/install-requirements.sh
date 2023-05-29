@@ -10,15 +10,15 @@ sudo apt-get install -y python3-pip build-essential cmake libcurl4-openssl-dev f
 sudo pip3 install -r ./requirements.txt
 
 # Create required files
-sudo mkdir -p /home/pi/data/power-meter/
-sudo touch /home/pi/data/power-meter/current_power_usage
-sudo touch /home/pi/data/power-meter/avg_power_usage
-sudo touch /home/pi/data/power-meter/wallet_addres
-sudo touch /home/pi/data/power-meter/total_rewards
-sudo touch /home/pi/data/power-meter/last_interval_time
-sudo touch /home/pi/data/power-meter/tokens_per_h
-sudo touch /home/pi/data/power-meter/device_id
-sudo touch /home/pi/data/power-meter/status
+mkdir -p /home/pi/data/power-meter/
+touch /home/pi/data/power-meter/current_power_usage
+touch /home/pi/data/power-meter/avg_power_usage
+touch /home/pi/data/power-meter/wallet_addres
+touch /home/pi/data/power-meter/total_rewards
+touch /home/pi/data/power-meter/last_interval_time
+touch /home/pi/data/power-meter/tokens_per_h
+touch /home/pi/data/power-meter/device_id
+touch /home/pi/data/power-meter/status
 
 # Install blinka
 wget https://raw.githubusercontent.com/adafruit/Raspberry-Pi-Installer-Scripts/master/raspi-blinka.py

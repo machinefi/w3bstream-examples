@@ -6,8 +6,6 @@ cmake -DGIT_SUBMODULE_UPDATE=ON -S ./ -B ./build-out
 cmake --build build-out --target power-meter
 sudo cp build-out/power-meter /usr/local/bin/power-meter-backend
 sudo cp display.py /usr/local/bin/power-meter-display
-sudo mkdir -p /home/pi/data/power-meter/
-sudo cp background.jpeg /home/pi/data/power-meter/background.jpeg
 
 # Setup the backend daemon
 sudo cp power-meter-backend.service /etc/systemd/system/power-meter.service

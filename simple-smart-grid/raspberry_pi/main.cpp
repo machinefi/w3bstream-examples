@@ -49,13 +49,14 @@ enum ResultCode
 namespace
 {
 	// Connection details
- 	std::string publisher_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJQYXlsb2FkIjoiOTAyNzM3MTkwNjYwNTA2MyIsImlzcyI6InczYnN0cmVhbSJ9.6LpnGIvkghTxOExdo4HLQDTFhhf5bXBLHiBtKJYkhIM";
-	std::string publish_url = "https://devnet-staging-api.w3bstream.com/srv-applet-mgr/v0/event/eth_0xf488835ae09314f5c5a0216ddb0968aa79113c03_test";
 
-    // Key store details.
-	std::string keystore_path = "/home/pi/data/power-meter/";
-	std::string private_key_path = keystore_path + "private.key";
-	std::string public_key_path = keystore_path + "public.key";
+ 	std::string publisher_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJQYXlsb2FkIjoiOTAyNzM3MTkwNjYwNTA2MyIsImlzcyI6InczYnN0cmVhbSJ9.00000000000000";
+	std::string publish_url = "https://devnet-staging-api.w3bstream.com/srv-applet-mgr/v0/event/eth_0x0000000_test";
+
+  // Key store details.
+	std::string base_path = "/home/pi/data/power-meter/";
+	std::string private_key_path = base_path + "private.key";
+	std::string public_key_path = base_path + "public.key";
 
 	// Constants.
 	const size_t send_update_frequency_s = 30;
@@ -81,7 +82,6 @@ namespace
 	#endif
 
 	// Data storage.
-	std::string base_path = "/Users/Santos/Documents/2-Code/Iotex/machinefi-projects/w3bstream-iot-sdk/build/Debug/MbedTLS/examples/power-meter";
 	std::string current_power_path = base_path + "current_power_usage";
 	std::string avg_power_path = base_path + "avg_power_usage";
 	std::string wallet_address_path = base_path + "wallet_address";
@@ -453,9 +453,9 @@ int main(int argc, char* argv[])
     for (int i = 1; i < argc; i++)
 	{
         std::string arg = argv[i];
-        if (arg == "-keystore_path" && i + 1 < argc)
+        if (arg == "-base_path" && i + 1 < argc)
 		{
-            keystore_path = argv[++i];
+            base_path = argv[++i];
         }
         if (arg == "-generate_key")
 		{
@@ -467,13 +467,14 @@ int main(int argc, char* argv[])
 	getcwd(current_path, sizeof(current_path));
 
 	// Set the path to the keys.
-	if (keystore_path == "")
+
+	if (base_path == "")
 	{
 		// Use the current path if none was specified.
-		keystore_path = current_path;
+		base_path = current_path;
 	}
-    private_key_path = keystore_path + "/private.key";
-	public_key_path = keystore_path + "/public.key";
+    private_key_path = base_path + "/private.key";
+	public_key_path = base_path + "/public.key";
 
 	if (erase_prevoius_keys)
 	{
