@@ -446,7 +446,7 @@ void* sensor_thread_func()
 
 int main(int argc, char* argv[])
 {
-	bool erase_prevoius_keys = false;
+	bool erase_previous_keys = false;
 
 	// Parse the command line args.
     for (int i = 1; i < argc; i++)
@@ -458,7 +458,7 @@ int main(int argc, char* argv[])
         }
         if (arg == "-generate_key")
 		{
-			erase_prevoius_keys = true;
+			erase_previous_keys = true;
         }
     }
 
@@ -474,7 +474,7 @@ int main(int argc, char* argv[])
     private_key_path = base_path + "/private.key";
 	public_key_path = base_path + "/public.key";
 
-	if (erase_prevoius_keys)
+	if (erase_previous_keys)
 	{
 		remove(private_key_path.c_str());
 		remove(public_key_path.c_str());
