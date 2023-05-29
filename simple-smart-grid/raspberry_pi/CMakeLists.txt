@@ -6,6 +6,12 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(Python REQUIRED Development)
 
+project(
+    power-meter
+    VERSION 0.1
+    LANGUAGES C CXX
+)
+
 set(SOURCES 
     main.cpp
     ina219/src/ina219.cc
