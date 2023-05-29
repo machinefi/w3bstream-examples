@@ -1,0 +1,12 @@
+setuptools
+Adafruit-Blinka
+adafruit-blinka-displayio
+adafruit-circuitpython-busdevice
+adafruit-circuitpython-ili9341
+adafruit-circuitpython-register
+adafruit-circuitpython-requests
+adafruit-circuitpython-rgb-display
+adafruit-circuitpython-typing 
+Adafruit-PlatformDetect
+Adafruit-PureIO 
+adafruit-python-shell 

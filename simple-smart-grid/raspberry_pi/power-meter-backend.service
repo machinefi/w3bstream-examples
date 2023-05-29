@@ -1,0 +1,17 @@
+# Create a systemctl service unit that runs the executable at /home/pi/example-power-meter
+# The executable should be restarted on failure
+
+# Start the systemctl unit configuration file
+
+[Unit]
+Description=Power Meter
+After=network.target
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+ExecStart=/usr/local/bin/power-meter-backend
+
+[Install]
+WantedBy=multi-user.target
