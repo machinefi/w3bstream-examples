@@ -40,7 +40,7 @@ The display is controlled by a Python script. You can run it using `python3 disp
 The backend can be run with the following command:  
 
 ```bash
-chamod +x build-out/power-meter
+chmod +x build-out/power-meter
 ./build-out/power-meter
 ```  
 
