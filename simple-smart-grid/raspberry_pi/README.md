@@ -29,7 +29,13 @@ cmake -DGIT_SUBMODULE_UPDATE=ON -S ./ -B ./build-out
 cmake --build build-out --target power-meter
 ```
 
-If everything builds successfully, you shoould see an executable named `power-meter` inside the `build-out` directory.  
+If everything builds successfully, you should see an executable named `power-meter` inside the `build-out` directory.  
+
+**Please Note**: This demo assumes the current sensor is connected over the SPI serial interface. Please make sure SPI is enabled on your board. On a Raspberry Pi you can enable SPI by running:
+```
+sudo raspi-config
+```
+and going to `3. interface options->I4 SPI`
 
 ## Run the frontend (display)
 
