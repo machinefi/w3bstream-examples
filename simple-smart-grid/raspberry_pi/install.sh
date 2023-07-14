@@ -13,6 +13,7 @@ sudo systemctl enable power-meter.service
 sudo systemctl start power-meter.service
 
 # Setup the display daemon
+cp background.jpeg /home/pi/data/power-meter/background.jpeg
 sudo cp power-meter-display.service /etc/systemd/system/power-meter-display.service
 sudo systemctl enable power-meter-display.service
 sudo systemctl start power-meter-display.service
