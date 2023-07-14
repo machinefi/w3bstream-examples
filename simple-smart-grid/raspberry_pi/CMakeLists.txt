@@ -4,13 +4,13 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-find_package(Python REQUIRED Development)
-
 project(
     power-meter
     VERSION 0.1
     LANGUAGES C CXX
 )
+
+find_package(Python REQUIRED Development)
 
 set(SOURCES 
     main.cpp
