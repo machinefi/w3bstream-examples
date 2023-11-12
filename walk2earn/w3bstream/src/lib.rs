@@ -13,10 +13,10 @@ use p256::{
 use serde_json::Value;
 use sha2::{Digest, Sha256};
 use signature::hazmat::PrehashVerifier;
+use ws_sdk::{blockchain, database, log, stream};
 
 use types::Record;
 mod abi;
-mod sdk;
 mod types;
 
 lazy_static! {
@@ -37,65 +37,71 @@ pub extern "C" fn alloc(size: i32) -> *mut u8 {
 
 #[no_mangle]
 pub extern "C" fn data_handler(event_id: i32) -> i32 {
-    sdk::log_info(
-        &format!("data_handler function called with event_id: {}", event_id));
-    sdk::log_info(
-        &format!("DeviceRegistry Contract: {}", CONTRACT_ADDR_DEVICES_REGISTRY));
-    sdk::log_info(
-        &format!("WalkToEarn Contract: {}", CONTRACT_ADDR_WALK_TO_EARN));
+    log::log_info(&format!(
+        "data_handler function called with event_id: {}",
+        event_id
+    ));
+    log::log_info(&format!(
+        "DeviceRegistry Contract: {}",
+        CONTRACT_ADDR_DEVICES_REGISTRY
+    ));
+    log::log_info(&format!(
+        "WalkToEarn Contract: {}",
+        CONTRACT_ADDR_WALK_TO_EARN
+    ));
 
-    let data_str = sdk::get_data_as_str(event_id).unwrap();
-    sdk::log_info(&format!("event data as string: {}",data_str));
-
-    let data_u8 = match sdk::get_data(event_id) {
-        Some(data) => data,
+    let data_u8 = match stream::get_data(event_id as _) {
+        Ok(data) => data,
         _ => {
-            sdk::log_error("failed to get data");
+            log::log_error("failed to get data");
             return -1;
         }
     };
-    
+    log::log_info(&format!(
+        "event data as string: {}",
+        String::from_utf8(data_u8.to_owned()).unwrap()
+    ));
+
     let input: Value = match serde_json::from_slice(data_u8.as_slice()) {
         Ok(val) => val,
         _ => {
-            sdk::log_error("failed to decode the event");
+            log::log_error("failed to decode the event");
             return -1;
         }
     };
-    // sdk::log_info(&format!("input: {:?}", input));
+    // log::log_info(&format!("input: {:?}", input));
 
-    sdk::log_info(&format!("Verifying the signature"));
+    log::log_info(&format!("Verifying the signature"));
     if !verify_signature(&input) {
         {
-            sdk::log_error("failed to verify signature");
+            log::log_error("failed to verify signature");
             return -1;
         }
     }
 
-    sdk::log_info(&format!("Signature is correct"));
-
+    log::log_info(&format!("Signature is correct"));
 
     let device_id = match input["device_id"].as_str() {
         Some(id) => id,
         _ => {
-            sdk::log_error("failed to get deviceId");
+            log::log_error("failed to get deviceId");
             return -1;
         }
     };
-    sdk::log_info(&format!("authorizing device {:?}", device_id));
+    log::log_info(&format!("authorizing device {:?}", device_id));
 
     if !auth_device(device_id) {
         {
-            sdk::log_error(&format!("failed to auth device(id:{})", device_id));
+            log::log_error(&format!("failed to auth device(id:{})", device_id));
             return -1;
         }
     };
-    sdk::log_info(&format!("Device is authorized: Storing data in DB."));
+    log::log_info(&format!("Device is authorized: Storing data in DB."));
 
     match sink_data(&input) {
         Ok(_) => 0,
         Err(_) => {
-            sdk::log_error("failed to sink data");
+            log::log_error("failed to sink data");
             return -1;
         }
     }
@@ -103,19 +109,22 @@ pub extern "C" fn data_handler(event_id: i32) -> i32 {
 
 #[no_mangle]
 pub extern "C" fn claim_handler(resource_id: i32) -> i32 {
-    sdk::log_info(&format!("Claim function called with resource_id: {}", resource_id));
+    log::log_info(&format!(
+        "Claim function called with resource_id: {}",
+        resource_id
+    ));
 
-    let data_u8 = match sdk::get_data(resource_id) {
-        Some(data) => data,
+    let data_u8 = match stream::get_data(resource_id as _) {
+        Ok(data) => data,
         _ => {
-            sdk::log_error("failed to get data from event");
+            log::log_error("failed to get data from event");
             return -1;
         }
     };
     let input: Value = match serde_json::from_slice(data_u8.as_slice()) {
         Ok(val) => val,
         _ => {
-            sdk::log_error("failed to decode the event");
+            log::log_error("failed to decode the event");
             return -1;
         }
     };
@@ -123,22 +132,25 @@ pub extern "C" fn claim_handler(resource_id: i32) -> i32 {
     let (req_id, device_id, from, to) = match decode_event_data(&input) {
         Some(val) => val,
         _ => {
-            sdk::log_error("failed to decode event data");
+            log::log_error("failed to decode event data");
             return -1;
         }
     };
 
-    sdk::log_info(&format!("calculating proof of walk for device id:{}), from timestamp: {}, to timestamp: {}", device_id, from, to));
+    log::log_info(&format!(
+        "calculating proof of walk for device id:{}), from timestamp: {}, to timestamp: {}",
+        device_id, from, to
+    ));
 
     let steps = match calc_steps(&device_id, from, to) {
         Some(steps) => steps,
         _ => {
-            sdk::log_info("failed to calculate steps");
+            log::log_info("failed to calculate steps");
             return -1;
         }
     };
 
-    sdk::log_info(&format!("Steps walked in the time range: {}", steps));
+    log::log_info(&format!("Steps walked in the time range: {}", steps));
 
     let data = match match steps {
         0 => encode_func_claim_activity_reply_data(
@@ -151,16 +163,21 @@ pub extern "C" fn claim_handler(resource_id: i32) -> i32 {
     } {
         Ok(val) => val,
         _ => {
-            sdk::log_error("failed to encode claim data");
+            log::log_error("failed to encode claim data");
             return -1;
         }
     };
 
-    sdk::log_info(&format!("Sending proof of walk tx {:?}", data));
-    match sdk::send_tx(&String::from(CONTRACT_ADDR_WALK_TO_EARN), &String::from("0"), &data) {
+    log::log_info(&format!("Sending proof of walk tx {:?}", data));
+    match blockchain::send_tx(
+        4690,
+        &String::from(CONTRACT_ADDR_WALK_TO_EARN),
+        &String::from("0"),
+        &data,
+    ) {
         Ok(_) => 0,
         Err(_) => {
-            sdk::log_error("send tx failed");
+            log::log_error("send tx failed");
             return -1;
         }
     }
@@ -201,8 +218,8 @@ fn auth_device(device_id: &str) -> bool {
         Ok(data) => data,
         _ => return false,
     };
-    let ret = match sdk::call_contract(&to, &data) {
-        Some(val) => val,
+    let ret = match blockchain::call_contract(4690, &to, &data) {
+        Ok(val) => val,
         _ => return false,
     };
     match decode_func_is_authorized_device_data(ret) {
@@ -236,9 +253,9 @@ fn decode_func_is_authorized_device_data(data: Vec<u8>) -> Result<bool, ethabi::
 fn sink_data(data: &Value) -> Result<()> {
     let id = data["device_id"].as_str().unwrap().to_string();
 
-    let mut value: Vec<Record> = match sdk::get_db(&id) {
-        Some(ret) => serde_json::from_slice(ret.as_slice())?,
-        None => vec![],
+    let mut value: Vec<Record> = match database::kv::get(&id) {
+        Ok(ret) => serde_json::from_slice(ret.as_slice())?,
+        _ => vec![],
     };
 
     value.push(Record {
@@ -248,7 +265,7 @@ fn sink_data(data: &Value) -> Result<()> {
         totalsteps: data["message"]["steps"].as_u64().unwrap(),
     });
 
-    sdk::set_db(&id, serde_json::to_string(&value)?.into_bytes())
+    database::kv::set(&id, serde_json::to_string(&value)?.into_bytes())
 }
 
 fn decode_event_data(data: &Value) -> Option<(u64, String, u64, u64)> {
@@ -298,7 +315,7 @@ fn get_value_in_log_by_name(log: &Log, name: &str) -> Option<Token> {
 }
 
 fn calc_steps(device_id: &String, from: u64, to: u64) -> Option<u64> {
-    let ret = sdk::get_db(&device_id)?;
+    let ret = database::kv::get(&device_id).ok()?;
     let records: Vec<Record> = serde_json::from_slice(ret.as_slice()).ok()?;
     if records.len() < 2 {
         return Some(0);
@@ -324,7 +341,7 @@ fn encode_func_claim_activity_reply_data(
     is_success: bool,
     error: String,
 ) -> Result<String, ethabi::Error> {
-    sdk::log_info(&format!("Encoding claim activity reply with req_id: {req_id}, steps: {steps}, is_success: {is_success}, error: {error}", req_id=req_id, steps=steps, is_success=is_success, error=error));
+    log::log_info(&format!("Encoding claim activity reply with req_id: {req_id}, steps: {steps}, is_success: {is_success}, error: {error}", req_id=req_id, steps=steps, is_success=is_success, error=error));
 
     let encoded = WALK_TO_EARN
         .function("claimActivityReply")?
@@ -335,6 +352,6 @@ fn encode_func_claim_activity_reply_data(
             ethabi::Token::String(error),
         ])?;
     let ret = hex::encode(encoded);
-    // sdk::log_info(&format!("Encoded data: {}", ret));
+    // log::log_info(&format!("Encoded data: {}", ret));
     Ok(ret)
 }
